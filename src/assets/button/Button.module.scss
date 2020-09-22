@@ -1,0 +1,28 @@
+@import "styles/globals.scss";
+
+.root {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.borderBottom {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    border-radius: calc(#{$radius} - 2px);
+    z-index: 1;
+    top: 8px;
+}
+
+.content {
+    position: relative;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius;
+    z-index: 2;
+}
