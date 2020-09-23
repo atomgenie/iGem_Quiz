@@ -13,6 +13,7 @@ const Start: React.FC<props> = ({ nextScreen }) => {
 
     const [propsLogo, setPropsLogo] = useSpring(() => ({
         top: -400,
+        opacity: 0,
     }))
 
     const [propsButton, setButton] = useSpring(() => ({
@@ -30,7 +31,7 @@ const Start: React.FC<props> = ({ nextScreen }) => {
             return
         }
 
-        setPropsLogo({ top: 0 })
+        setPropsLogo({ top: 0, opacity: 1 })
         setText({ opacity: 1 })
 
         const loopFn = setTimeout(async () => {
@@ -51,7 +52,7 @@ const Start: React.FC<props> = ({ nextScreen }) => {
     return (
         <div className={styles.root}>
             <a.div className={styles.img}>
-                <a.img style={propsLogo} src={Img} alt="Bactail" />
+                <a.img style={propsLogo as any} src={Img} alt="Bactail" />
             </a.div>
             <a.div style={textProps as any} className={styles.text}>
                 The ultimate quiz on bacteria, antibiotics and antimicrobial resistance
@@ -63,7 +64,7 @@ const Start: React.FC<props> = ({ nextScreen }) => {
                         await Promise.all([
                             (setButton({ bottom: -400 }),
                             setText({ opacity: 0 }),
-                            setPropsLogo({ top: -400 })),
+                            setPropsLogo({ top: -400, opacity: 0 })),
                         ])
                         nextScreen()
                     }}

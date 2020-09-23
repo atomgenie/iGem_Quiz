@@ -15,29 +15,32 @@ const LevelChoice: React.FC<props> = ({ handleNextView }) => {
 
     const [card1, setCard1] = useSpring(() => ({
         left: "150%",
+        opacity: 0,
     }))
 
     const [card2, setCard2] = useSpring(() => ({
         left: "150%",
+        opacity: 0,
     }))
 
     const [card3, setCard3] = useSpring(() => ({
         left: "150%",
+        opacity: 0,
     }))
 
     useEffect(() => {
         const startAnim = async () => {
             await Promise.all([
-                setCard1({ left: "0%" }),
+                setCard1({ left: "0%", opacity: 1 }),
                 new Promise(res =>
                     setTimeout(async () => {
-                        await setCard2({ left: "0%" })
+                        await setCard2({ left: "0%", opacity: 1 })
                         res()
                     }, 150),
                 ),
                 new Promise(res =>
                     setTimeout(async () => {
-                        await setCard3({ left: "0%" })
+                        await setCard3({ left: "0%", opacity: 1 })
                         res()
                     }, 300),
                 ),
@@ -51,16 +54,16 @@ const LevelChoice: React.FC<props> = ({ handleNextView }) => {
         reduxDispatch(setLevel(levelType))
 
         await Promise.all([
-            setCard1({ left: "-150%" }),
+            setCard1({ left: "-150%", opacity: 0 }),
             new Promise(res =>
                 setTimeout(async () => {
-                    await setCard2({ left: "-150%" })
+                    await setCard2({ left: "-150%", opacity: 0 })
                     res()
                 }, 150),
             ),
             new Promise(res =>
                 setTimeout(async () => {
-                    await setCard3({ left: "-150%" })
+                    await setCard3({ left: "-150%", opacity: 0 })
                     res()
                 }, 300),
             ),
@@ -71,7 +74,7 @@ const LevelChoice: React.FC<props> = ({ handleNextView }) => {
 
     return (
         <div className={styles.root}>
-            <a.div className={styles.card} style={card1}>
+            <a.div className={styles.card} style={card1 as any}>
                 <div className={styles.buttonDiv}>
                     <Button
                         startColor="#FDFE40"
@@ -88,7 +91,7 @@ const LevelChoice: React.FC<props> = ({ handleNextView }) => {
                 </div>
             </a.div>
 
-            <a.div style={card2} className={styles.card}>
+            <a.div style={card2 as any} className={styles.card}>
                 <div className={styles.buttonDiv}>
                     <Button
                         startColor="#0E94E6"
@@ -102,7 +105,7 @@ const LevelChoice: React.FC<props> = ({ handleNextView }) => {
                 </div>
                 <div className={styles.text}>For advanced scientists</div>
             </a.div>
-            <a.div style={card3} className={styles.card}>
+            <a.div style={card3 as any} className={styles.card}>
                 <div className={styles.buttonDiv}>
                     <Button
                         startColor="#E52528"

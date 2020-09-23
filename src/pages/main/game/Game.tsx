@@ -33,14 +33,14 @@ export default () => {
 
     const [pos /*, setPos*/] = useState(0)
 
-    const [panelAnim, setPanel] = useSpring(() => ({ left: "100%" }))
+    const [panelAnim, setPanel] = useSpring(() => ({ left: "100%", opacity: 0 }))
 
     const enterPanel = useCallback(async () => {
-        setPanel({ left: "0%" })
+        setPanel({ left: "0%", opacity: 1 })
     }, [setPanel])
 
     // const outPanel = useCallback(async () => {
-    //     setPanel({ left: "-100%" })
+    //     setPanel({ left: "-100%", opacity: 0 })
     // }, [setPanel])
 
     const actualQuestion: Question | undefined = quizList[pos] as Question | undefined
@@ -71,7 +71,7 @@ export default () => {
 
     return (
         <div className={styles.root}>
-            <a.div className={styles.card} style={panelAnim}>
+            <a.div className={styles.card} style={panelAnim as any}>
                 <div className={styles.title}>Question {pos + 1}</div>
                 <div className={styles.questionTitle}>{actualQuestion.question}</div>
             </a.div>
