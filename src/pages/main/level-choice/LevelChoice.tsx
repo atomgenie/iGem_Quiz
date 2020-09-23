@@ -3,12 +3,16 @@ import styles from "./LevelChoice.module.scss"
 import { Button } from "assets"
 import { a, useSpring } from "react-spring"
 import { LEVEL_TYPE } from "helpers/level-type"
+import { useDispatch } from "react-redux"
+import { setLevel } from "helpers/redux/data/data.actions"
 
 interface props {
-    handleSelectLevelType: (levelType: LEVEL_TYPE) => void
+    handleNextView: () => void
 }
 
-const LevelChoice: React.FC<props> = ({ handleSelectLevelType }) => {
+const LevelChoice: React.FC<props> = ({ handleNextView }) => {
+    const reduxDispatch = useDispatch()
+
     const [card1, setCard1] = useSpring(() => ({
         left: "150%",
     }))
@@ -44,6 +48,8 @@ const LevelChoice: React.FC<props> = ({ handleSelectLevelType }) => {
     }, [setCard1, setCard2, setCard3])
 
     const handleLevelChoice = async (levelType: LEVEL_TYPE) => {
+        reduxDispatch(setLevel(levelType))
+
         await Promise.all([
             setCard1({ left: "-150%" }),
             new Promise(res =>
@@ -60,7 +66,7 @@ const LevelChoice: React.FC<props> = ({ handleSelectLevelType }) => {
             ),
         ])
 
-        handleSelectLevelType(levelType)
+        handleNextView()
     }
 
     return (
