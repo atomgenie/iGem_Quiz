@@ -1,7 +1,7 @@
 import { LEVEL_TYPE } from "helpers/level-type"
 import { Question } from "helpers/quiz/quiz"
 import { StoreType } from "helpers/redux/store"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { setQuiz } from "helpers/redux/data/data.actions"
 
@@ -124,6 +124,26 @@ export default () => {
         }
     }
 
+    const mutilpleAnswers = useMemo(() => (actualQuestion?.corrects.length || 0) > 1, [
+        actualQuestion,
+    ])
+
+    const [transitionHint, setTransitionHint] = useSpring(() => ({
+        opacity: 0,
+    }))
+
+    useEffect(() => {
+        if (mutilpleAnswers && !showValid) {
+            setTransitionHint({
+                opacity: 1,
+            })
+        } else {
+            setTransitionHint({
+                opacity: 0,
+            })
+        }
+    }, [mutilpleAnswers, setTransitionHint, showValid])
+
     if (!actualQuestion) {
         return <div></div>
     }
@@ -136,11 +156,9 @@ export default () => {
             </a.div>
             <div className={styles.solutionList}>
                 <div className={styles.listOptions}>
-                    {actualQuestion.corrects.length > 1 && (
-                        <div className={styles.hint}>
-                            {actualQuestion.corrects.length} valid answers
-                        </div>
-                    )}
+                    <a.div style={transitionHint as any} className={styles.hint}>
+                        {actualQuestion.corrects.length} valid answers
+                    </a.div>
                     {actualQuestion.options.map((option, i) => {
                         const isRightQuestion = actualQuestion.corrects.some(
                             correct => correct === option,
