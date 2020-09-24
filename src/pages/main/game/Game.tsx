@@ -1,10 +1,5 @@
 import { LEVEL_TYPE } from "helpers/level-type"
-import {
-    Question,
-    quiz,
-    mapDifficultyToLevelType,
-    MAX_QUIZ_SIZE,
-} from "helpers/quiz/quiz"
+import { Question } from "helpers/quiz/quiz"
 import { StoreType } from "helpers/redux/store"
 import React, { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -13,57 +8,121 @@ import { setQuiz } from "helpers/redux/data/data.actions"
 import styles from "./Game.module.scss"
 import { Button } from "assets"
 import { useSpring, a, useSprings } from "react-spring"
+import { quizHelper, RESPONSE_STATE } from "helpers/quiz/quiz-hepler"
 
 export default () => {
     const difficulty = useSelector<StoreType, LEVEL_TYPE>(store => store.data.levelType)
     const quizList = useSelector<StoreType, Question[]>(store => store.data.quiz)
 
+    const [allowInteraction, setAllowInteraction] = useState<boolean>(true)
+
     const reduxDispatch = useDispatch()
 
     useEffect(() => {
         if (quizList.length === 0) {
-            const selectedQuiz = quiz
-                .filter(elm => mapDifficultyToLevelType[elm.difficulty] === difficulty)
-                .sort(() => Math.random() * 2 - 1)
-                .slice(0, MAX_QUIZ_SIZE)
+            const selectedQuiz = quizHelper.generateQuiz(difficulty)
 
             reduxDispatch(setQuiz(selectedQuiz))
         }
     }, [difficulty, quizList, reduxDispatch])
 
-    const [pos /*, setPos*/] = useState(0)
+    const [pos, setPos] = useState(0)
 
-    const [panelAnim, setPanel] = useSpring(() => ({ left: "100%", opacity: 0 }))
+    const [panelAnim, setPanel] = useSpring(() => ({ left: 400, opacity: 0 }))
 
     const enterPanel = useCallback(async () => {
-        setPanel({ left: "0%", opacity: 1 })
+        await setPanel({ left: 0, opacity: 1 })
     }, [setPanel])
 
-    // const outPanel = useCallback(async () => {
-    //     setPanel({ left: "-100%", opacity: 0 })
-    // }, [setPanel])
+    const outPanel = useCallback(async () => {
+        await setPanel({ left: -400, opacity: 0 })
+    }, [setPanel])
 
     const actualQuestion: Question | undefined = quizList[pos] as Question | undefined
 
-    const isYesNo =
-        actualQuestion &&
-        ((actualQuestion.options[0] === "Yes" && actualQuestion.options[1] === "No") ||
-            (actualQuestion.options[1] === "Yes" && actualQuestion.options[0] === "No"))
-
-    const [animOptions, setAnimOptions] = useSprings(20, () => ({ bottom: -500 }))
+    const [animOptions, setAnimOptions] = useSprings(20, () => ({
+        bottom: -500,
+        left: 0,
+        opacity: 0,
+    }))
 
     const enterOptions = useCallback(async () => {
-        setAnimOptions(() => ({ bottom: 0 }))
+        await setAnimOptions(() => ({ bottom: 0, left: 0, opacity: 1 }))
     }, [setAnimOptions])
 
-    // const outOptions = useCallback(async () => {
-    //     setAnimOptions(() => ({ bottom: -500 }))
-    // }, [setAnimOptions])
+    const outOptions = useCallback(async () => {
+        await setAnimOptions(() => ({ bottom: -500, left: 0, opacity: 0 }))
+    }, [setAnimOptions])
 
     useEffect(() => {
         enterPanel()
         enterOptions()
     }, [enterPanel, enterOptions])
+
+    const [clickeds, setClickeds] = useState<string[]>([])
+
+    const [showValid, setShowValid] = useState<boolean>(false)
+
+    const handleNextQuestion = async () => {
+        setAllowInteraction(false)
+
+        setShowValid(true)
+        await new Promise(res => setTimeout(res, 1500))
+        await Promise.all([outOptions(), outPanel()])
+        setPos(pos + 1)
+        setShowValid(false)
+        setClickeds([])
+        await Promise.all([
+            setAnimOptions(() => ({
+                bottom: -500,
+                left: 0,
+                opacity: 0,
+                immediate: true,
+            })),
+            setPanel({
+                left: 400,
+                opacity: 0,
+                immediate: true,
+            }),
+        ])
+
+        await Promise.all([enterOptions(), enterPanel()])
+
+        setAllowInteraction(true)
+    }
+
+    const handleWrongAnswer = async () => {
+        handleNextQuestion()
+    }
+
+    const handleClick = (value: string) => {
+        if (!allowInteraction) {
+            return
+        }
+
+        if (!actualQuestion) {
+            return
+        }
+
+        const newClicks = [...clickeds, value]
+        const responseState = quizHelper.getResponseState(actualQuestion, newClicks)
+
+        if (responseState === RESPONSE_STATE.VALID) {
+            handleNextQuestion()
+            return
+        }
+
+        if (responseState === RESPONSE_STATE.INCOMPLETE) {
+            setClickeds(newClicks)
+            return
+        }
+
+        if (responseState === RESPONSE_STATE.INVALID) {
+            setClickeds(newClicks)
+            handleWrongAnswer()
+            return
+        }
+    }
 
     if (!actualQuestion) {
         return <div></div>
@@ -76,53 +135,69 @@ export default () => {
                 <div className={styles.questionTitle}>{actualQuestion.question}</div>
             </a.div>
             <div className={styles.solutionList}>
-                {isYesNo && (
-                    <div className={styles.doubleOption}>
-                        <div className={styles.option1}>
-                            <Button
-                                className={styles.buttonOption}
-                                startColor="#FDFE40"
-                                endColor="#FFC400"
-                                borderColor="#E18900"
-                                shadow="rgba(253, 254, 64, 0.5)"
-                            >
-                                Yes
-                            </Button>
+                <div className={styles.listOptions}>
+                    {actualQuestion.corrects.length > 1 && (
+                        <div className={styles.hint}>
+                            {actualQuestion.corrects.length} valid answers
                         </div>
-                        <div className={styles.option2}>
-                            <Button
-                                className={styles.buttonOption}
-                                startColor="#E52528"
-                                endColor="#BF1C2B"
-                                borderColor="#890406"
-                                shadow="rgba(229, 37, 40, 0.5)"
-                            >
-                                No
-                            </Button>
-                        </div>
-                    </div>
-                )}
-                {!isYesNo && (
-                    <div className={styles.listOptions}>
-                        {actualQuestion.options.map((option, i) => (
+                    )}
+                    {actualQuestion.options.map((option, i) => {
+                        const isRightQuestion = actualQuestion.corrects.some(
+                            correct => correct === option,
+                        )
+
+                        const isClick = clickeds.some(click => click === option)
+
+                        const isWrongClick = isClick && !isRightQuestion
+
+                        let buttonStyle = {
+                            startColor: "#199FEF",
+                            endColor: "#116699",
+                            borderColor: "#0B4568",
+                            shadow: "rgba(17, 102, 153, 0.5)",
+                        }
+
+                        if (
+                            (showValid && isRightQuestion) ||
+                            (isClick && isRightQuestion)
+                        ) {
+                            buttonStyle = {
+                                startColor: "#3CEB7A",
+                                endColor: "#009801",
+                                borderColor: "#066B07",
+                                shadow: "rgba(17, 102, 153, 0.5)",
+                            }
+                        }
+
+                        if (showValid && isWrongClick) {
+                            buttonStyle = {
+                                startColor: "#E52528",
+                                endColor: "#BF1C2B",
+                                borderColor: "#890406",
+                                shadow: "rgba(229, 37, 40, 0.5)",
+                            }
+                        }
+
+                        return (
                             <a.div
-                                style={animOptions[i]}
+                                style={animOptions[i] as any}
                                 className={styles.optionOne}
                                 key={option}
                             >
                                 <Button
                                     className={styles.buttonOptionOne}
-                                    startColor="#199FEF"
-                                    endColor="#116699"
-                                    borderColor="#0B4568"
-                                    shadow="rgba(17, 102, 153, 0.5)"
+                                    startColor={buttonStyle.startColor}
+                                    endColor={buttonStyle.endColor}
+                                    borderColor={buttonStyle.borderColor}
+                                    shadow={buttonStyle.shadow}
+                                    onClick={() => handleClick(option)}
                                 >
                                     {option}
                                 </Button>
                             </a.div>
-                        ))}
-                    </div>
-                )}
+                        )
+                    })}
+                </div>
             </div>
         </div>
     )

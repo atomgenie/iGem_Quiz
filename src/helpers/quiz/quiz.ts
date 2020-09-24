@@ -146,7 +146,7 @@ const quizList: Question[] = [
     },
     {
         question: "What is the main action of bacteria on earth ? ",
-        options: ["Decomposers", " Make medicine", " Clean up plastics", " "],
+        options: ["Decomposers", " Make medicine", " Clean up plastics"],
         corrects: ["Decomposers"],
         isOr: false,
         difficulty: "Easy",
