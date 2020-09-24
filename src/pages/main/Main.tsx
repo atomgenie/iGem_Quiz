@@ -12,7 +12,7 @@ enum STEP {
 }
 
 export default () => {
-    const [step, setStep] = useState<STEP>(STEP.PLAY)
+    const [step, setStep] = useState<STEP>(STEP.START)
 
     return (
         <div className={styles.root}>
