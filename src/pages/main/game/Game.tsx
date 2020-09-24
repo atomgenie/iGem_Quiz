@@ -3,7 +3,13 @@ import { Question } from "helpers/quiz/quiz"
 import { StoreType } from "helpers/redux/store"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { setQuiz } from "helpers/redux/data/data.actions"
+import {
+    setQuiz,
+    incrementQuestion,
+    incrementScore,
+} from "helpers/redux/data/data.actions"
+
+import Win from "./Win"
 
 import styles from "./Game.module.scss"
 import { Button } from "assets"
@@ -26,7 +32,11 @@ export default () => {
         }
     }, [difficulty, quizList, reduxDispatch])
 
-    const [pos, setPos] = useState(0)
+    const questionNumber = useSelector<StoreType, number>(
+        store => store.data.questionNumber,
+    )
+
+    const [pos, setPos] = useState(questionNumber)
 
     const [panelAnim, setPanel] = useSpring(() => ({ left: 400, opacity: 0 }))
 
@@ -64,6 +74,7 @@ export default () => {
     const [showValid, setShowValid] = useState<boolean>(false)
 
     const handleNextQuestion = async () => {
+        reduxDispatch(incrementQuestion())
         setAllowInteraction(false)
 
         setShowValid(true)
@@ -108,6 +119,7 @@ export default () => {
         const responseState = quizHelper.getResponseState(actualQuestion, newClicks)
 
         if (responseState === RESPONSE_STATE.VALID) {
+            reduxDispatch(incrementScore())
             handleNextQuestion()
             return
         }
@@ -145,6 +157,10 @@ export default () => {
     }, [mutilpleAnswers, setTransitionHint, showValid])
 
     if (!actualQuestion) {
+        if (pos !== 0) {
+            return <Win />
+        }
+
         return <div></div>
     }
 
