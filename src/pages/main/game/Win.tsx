@@ -1,15 +1,27 @@
 import { Button } from "assets"
 import { StoreType } from "helpers/redux/store"
 import React, { useEffect } from "react"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { useSpring, a } from "react-spring"
 import styles from "./Win.module.scss"
+import { resetQuiz } from "helpers/redux/data/data.actions"
+import { stateSaver } from "helpers/state-saver/state-saver"
 
-export default () => {
+interface props {
+    restartGame: () => void
+}
+
+const Win: React.FC<props> = ({ restartGame }) => {
     const score = useSelector<StoreType, number>(store => store.data.score)
     const questionNumber = useSelector<StoreType, number>(
         store => store.data.questionNumber,
     )
+
+    useEffect(() => {
+        stateSaver.resetState()
+    }, [])
+
+    const reduxDispatch = useDispatch()
 
     const [titleAnim, setTitleAnim] = useSpring(() => ({
         position: "relative",
@@ -46,6 +58,28 @@ export default () => {
         })
     }, [setTitleAnim, setScoreAnim, setPlayAgainAnim])
 
+    const handlePlayAgain = async () => {
+        await Promise.all([
+            setTitleAnim({
+                bottom: 400,
+                opacity: 0,
+            }),
+
+            setScoreAnim({
+                right: 400,
+                opacity: 0,
+            }),
+
+            setPlayAgainAnim({
+                bottom: -500,
+                opacity: 0,
+            }),
+        ])
+
+        restartGame()
+        reduxDispatch(resetQuiz())
+    }
+
     return (
         <div className={styles.root}>
             <a.div style={titleAnim as any} className={styles.score}>
@@ -61,6 +95,7 @@ export default () => {
                     endColor="#BF1C2B"
                     borderColor="#890406"
                     shadow="rgba(229, 37, 40, 0.5)"
+                    onClick={handlePlayAgain}
                 >
                     PLAY AGAIN!
                 </Button>
@@ -68,3 +103,5 @@ export default () => {
         </div>
     )
 }
+
+export default Win

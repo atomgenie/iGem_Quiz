@@ -1,7 +1,7 @@
 import { LEVEL_TYPE } from "helpers/level-type"
 import { Question } from "helpers/quiz/quiz"
 
-import { ACTION, Actions } from "./data.types"
+import { ACTION, Actions, DataState } from "./data.types"
 
 export const setLevel = (level: LEVEL_TYPE): Actions => ({
     type: ACTION.SET_LEVEL,
@@ -25,4 +25,13 @@ export const incrementScore = (): Actions => ({
 
 export const incrementQuestion = (): Actions => ({
     type: ACTION.INCREMENT_QUESTION,
+})
+
+export const resetQuiz = (): Actions => ({
+    type: ACTION.RESET_QUIZ,
+})
+
+export const setFullQuiz = (payload: DataState): Actions => ({
+    type: ACTION.SET_FULL_QUIZ,
+    payload,
 })

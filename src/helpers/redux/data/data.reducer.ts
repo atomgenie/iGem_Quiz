@@ -45,6 +45,12 @@ export const dataReducer: Reducer<DataState, Actions> = (
                 score: state.score + 1,
             }
         }
+        case ACTION.RESET_QUIZ: {
+            return defaultState
+        }
+        case ACTION.SET_FULL_QUIZ: {
+            return action.payload
+        }
         default:
             return state
     }

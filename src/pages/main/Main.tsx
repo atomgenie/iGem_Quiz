@@ -20,7 +20,12 @@ export default () => {
                 <img src={Logo} alt="Ionis" />
             </div>
             <div className={styles.content}>
-                {step === STEP.START && <Start nextScreen={() => setStep(STEP.CHOICE)} />}
+                {step === STEP.START && (
+                    <Start
+                        nextScreen={() => setStep(STEP.CHOICE)}
+                        triggerGame={() => setStep(STEP.PLAY)}
+                    />
+                )}
                 {step === STEP.CHOICE && (
                     <LevelChoice
                         handleNextView={() => {
@@ -28,7 +33,7 @@ export default () => {
                         }}
                     />
                 )}
-                {step === STEP.PLAY && <Game />}
+                {step === STEP.PLAY && <Game restartGame={() => setStep(STEP.CHOICE)} />}
             </div>
         </div>
     )

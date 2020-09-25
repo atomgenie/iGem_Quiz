@@ -1,15 +1,21 @@
 import { Button } from "assets"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import styles from "./Start.module.scss"
 import Img from "./Bactail.png"
 import { a, useSpring } from "react-spring"
+import { stateSaver } from "helpers/state-saver/state-saver"
+import { useDispatch } from "react-redux"
+import { setFullQuiz } from "helpers/redux/data/data.actions"
 
 interface props {
     nextScreen: () => void
+    triggerGame: () => void
 }
 
-const Start: React.FC<props> = ({ nextScreen }) => {
+const Start: React.FC<props> = ({ nextScreen, triggerGame }) => {
     const [stopAnim, setStopAnim] = useState(false)
+
+    const reduxDispatch = useDispatch()
 
     const [propsLogo, setPropsLogo] = useSpring(() => ({
         top: -400,
@@ -24,6 +30,19 @@ const Start: React.FC<props> = ({ nextScreen }) => {
         opacity: 0,
     }))
 
+    const initialState = useMemo(() => {
+        const data = stateSaver.getState()
+        if (!data) {
+            return undefined
+        }
+
+        return data.questionNumber !== 0 ? data : undefined
+    }, [])
+
+    const [animNotif, setAnimNotif] = useSpring(() => ({
+        top: -400,
+        opacity: 0,
+    }))
     useEffect(() => {
         let loop = 1
 
@@ -33,6 +52,7 @@ const Start: React.FC<props> = ({ nextScreen }) => {
 
         setPropsLogo({ top: 0, opacity: 1 })
         setText({ opacity: 1 })
+        setAnimNotif({ opacity: 1, top: 20 })
 
         const loopFn = setTimeout(async () => {
             await setButton({ bottom: 0 })
@@ -47,10 +67,44 @@ const Start: React.FC<props> = ({ nextScreen }) => {
             loop = 0
             clearTimeout(loopFn)
         }
-    }, [setButton, stopAnim, setPropsLogo, setText])
+    }, [setButton, stopAnim, setPropsLogo, setText, setAnimNotif])
+
+    const handleOutAnim = async () => {
+        setStopAnim(true)
+        await Promise.all([
+            (setButton({ bottom: -400 }),
+            setText({ opacity: 0 }),
+            setPropsLogo({ top: -400, opacity: 0 })),
+            setAnimNotif({ top: -400, opacity: 0 }),
+        ])
+    }
+
+    const handleRestart = async () => {
+        if (!initialState) {
+            return
+        }
+
+        await handleOutAnim()
+        reduxDispatch(setFullQuiz(initialState))
+        triggerGame()
+    }
 
     return (
         <div className={styles.root}>
+            {initialState !== undefined && (
+                <a.div style={animNotif as any} className={styles.notification}>
+                    <Button
+                        onClick={handleRestart}
+                        startColor="white"
+                        endColor="#dedede"
+                        borderColor="#bdbdbd"
+                        className={styles.buttonNotification}
+                        shadow="rgba(0, 0, 0, 0.2)"
+                    >
+                        Restart previous session
+                    </Button>
+                </a.div>
+            )}
             <a.div className={styles.img}>
                 <a.img style={propsLogo as any} src={Img} alt="Bactail" />
             </a.div>
@@ -60,12 +114,7 @@ const Start: React.FC<props> = ({ nextScreen }) => {
             <a.div style={propsButton} className={styles.playBtn}>
                 <Button
                     onClick={async () => {
-                        setStopAnim(true)
-                        await Promise.all([
-                            (setButton({ bottom: -400 }),
-                            setText({ opacity: 0 }),
-                            setPropsLogo({ top: -400, opacity: 0 })),
-                        ])
+                        await handleOutAnim()
                         nextScreen()
                     }}
                     className={styles.button}

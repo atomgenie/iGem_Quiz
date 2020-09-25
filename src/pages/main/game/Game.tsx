@@ -16,7 +16,11 @@ import { Button } from "assets"
 import { useSpring, a, useSprings } from "react-spring"
 import { quizHelper, RESPONSE_STATE } from "helpers/quiz/quiz-hepler"
 
-export default () => {
+interface props {
+    restartGame: () => void
+}
+
+const Game: React.FC<props> = ({ restartGame }) => {
     const difficulty = useSelector<StoreType, LEVEL_TYPE>(store => store.data.levelType)
     const quizList = useSelector<StoreType, Question[]>(store => store.data.quiz)
 
@@ -115,6 +119,10 @@ export default () => {
             return
         }
 
+        if (clickeds.some(clicks => clicks === value)) {
+            return
+        }
+
         const newClicks = [...clickeds, value]
         const responseState = quizHelper.getResponseState(actualQuestion, newClicks)
 
@@ -158,7 +166,7 @@ export default () => {
 
     if (!actualQuestion) {
         if (pos !== 0) {
-            return <Win />
+            return <Win restartGame={restartGame} />
         }
 
         return <div></div>
@@ -236,3 +244,5 @@ export default () => {
         </div>
     )
 }
+
+export default Game

@@ -1,5 +1,6 @@
 import { LEVEL_TYPE } from "helpers/level-type"
 import { Question } from "helpers/quiz/quiz"
+import { StoreType } from "../store"
 
 export interface DataState {
     levelType: LEVEL_TYPE
@@ -14,6 +15,8 @@ export enum ACTION {
     SET_SCORE = "DATA/SET_SCORE",
     INCREMENT_SCORE = "DATA/INCREMENT_SCORE",
     INCREMENT_QUESTION = "DATA/INCREMENT_QUESTION",
+    RESET_QUIZ = "DATA/RESET_QUIZ",
+    SET_FULL_QUIZ = "DATA/SET_FULL_QUIZ",
 }
 
 interface SetLevel {
@@ -40,4 +43,20 @@ interface IncrementQuestion {
     type: ACTION.INCREMENT_QUESTION
 }
 
-export type Actions = SetLevel | SetQuiz | SetScore | IncrementQuestion | IncrementScore
+interface ResetQuiz {
+    type: ACTION.RESET_QUIZ
+}
+
+interface SetFullQuiz {
+    type: ACTION.SET_FULL_QUIZ
+    payload: StoreType["data"]
+}
+
+export type Actions =
+    | SetLevel
+    | SetQuiz
+    | SetScore
+    | IncrementQuestion
+    | IncrementScore
+    | ResetQuiz
+    | SetFullQuiz
