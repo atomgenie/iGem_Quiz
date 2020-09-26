@@ -175,7 +175,9 @@ const Game: React.FC<props> = ({ restartGame }) => {
     return (
         <div className={styles.root}>
             <a.div className={styles.card} style={panelAnim as any}>
-                <div className={styles.title}>Question {pos + 1}</div>
+                <div className={styles.title}>
+                    Question {pos + 1} / {quizList.length}
+                </div>
                 <div className={styles.questionTitle}>{actualQuestion.question}</div>
             </a.div>
             <div className={styles.solutionList}>

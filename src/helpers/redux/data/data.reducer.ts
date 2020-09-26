@@ -7,6 +7,9 @@ const defaultState: DataState = {
     quiz: [],
     questionNumber: 0,
     score: 0,
+    online: {
+        active: false,
+    },
 }
 
 export const dataReducer: Reducer<DataState, Actions> = (
@@ -50,6 +53,16 @@ export const dataReducer: Reducer<DataState, Actions> = (
         }
         case ACTION.SET_FULL_QUIZ: {
             return action.payload
+        }
+        case ACTION.SET_ONLINE: {
+            return {
+                ...state,
+                online: {
+                    active: true,
+                    nickname: action.nickname,
+                    roomId: action.roomId,
+                },
+            }
         }
         default:
             return state

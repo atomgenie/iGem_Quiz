@@ -6,6 +6,8 @@ import { useSpring, a } from "react-spring"
 import styles from "./Win.module.scss"
 import { resetQuiz } from "helpers/redux/data/data.actions"
 import { stateSaver } from "helpers/state-saver/state-saver"
+import { gameManager } from "helpers/game"
+import { LEVEL_TYPE } from "helpers/level-type"
 
 interface props {
     restartGame: () => void
@@ -13,9 +15,16 @@ interface props {
 
 const Win: React.FC<props> = ({ restartGame }) => {
     const score = useSelector<StoreType, number>(store => store.data.score)
+    const level = useSelector<StoreType, LEVEL_TYPE>(store => store.data.levelType)
     const questionNumber = useSelector<StoreType, number>(
         store => store.data.questionNumber,
     )
+
+    const isOnline = useSelector<StoreType, boolean>(store => store.data.online.active)
+
+    useEffect(() => {
+        gameManager.setScore(score, level)
+    }, [isOnline, score, level])
 
     useEffect(() => {
         stateSaver.resetState()

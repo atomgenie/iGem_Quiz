@@ -35,3 +35,9 @@ export const setFullQuiz = (payload: DataState): Actions => ({
     type: ACTION.SET_FULL_QUIZ,
     payload,
 })
+
+export const setOnline = (nickname: string, roomId: string): Actions => ({
+    type: ACTION.SET_ONLINE,
+    nickname,
+    roomId,
+})

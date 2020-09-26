@@ -10,9 +10,10 @@ import { setFullQuiz } from "helpers/redux/data/data.actions"
 interface props {
     nextScreen: () => void
     triggerGame: () => void
+    playOnline: () => void
 }
 
-const Start: React.FC<props> = ({ nextScreen, triggerGame }) => {
+const Start: React.FC<props> = ({ nextScreen, triggerGame, playOnline }) => {
     const [stopAnim, setStopAnim] = useState(false)
 
     const reduxDispatch = useDispatch()
@@ -110,6 +111,22 @@ const Start: React.FC<props> = ({ nextScreen, triggerGame }) => {
             </a.div>
             <a.div style={textProps as any} className={styles.text}>
                 The ultimate quiz on bacteria, antibiotics and antimicrobial resistance
+            </a.div>
+
+            <a.div style={propsButton} className={styles.playBtn}>
+                <Button
+                    onClick={async () => {
+                        await handleOutAnim()
+                        playOnline()
+                    }}
+                    className={styles.button}
+                    startColor="#199FEF"
+                    endColor="#116699"
+                    borderColor="#0B4568"
+                    shadow="rgba(17, 102, 153, 0.5)"
+                >
+                    Play online
+                </Button>
             </a.div>
             <a.div style={propsButton} className={styles.playBtn}>
                 <Button

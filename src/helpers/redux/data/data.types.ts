@@ -7,6 +7,15 @@ export interface DataState {
     quiz: Question[]
     questionNumber: number
     score: number
+    online:
+        | {
+              active: true
+              roomId: string
+              nickname: string
+          }
+        | {
+              active: false
+          }
 }
 
 export enum ACTION {
@@ -17,6 +26,7 @@ export enum ACTION {
     INCREMENT_QUESTION = "DATA/INCREMENT_QUESTION",
     RESET_QUIZ = "DATA/RESET_QUIZ",
     SET_FULL_QUIZ = "DATA/SET_FULL_QUIZ",
+    SET_ONLINE = "DATA/SET_ONLINE",
 }
 
 interface SetLevel {
@@ -52,6 +62,12 @@ interface SetFullQuiz {
     payload: StoreType["data"]
 }
 
+interface SetOnline {
+    type: ACTION.SET_ONLINE
+    nickname: string
+    roomId: string
+}
+
 export type Actions =
     | SetLevel
     | SetQuiz
@@ -60,3 +76,4 @@ export type Actions =
     | IncrementScore
     | ResetQuiz
     | SetFullQuiz
+    | SetOnline
