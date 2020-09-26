@@ -24,6 +24,13 @@ class GameManager {
 
         await roomDatabase.setScore(this.roomId, this.playerName, score, level)
     }
+
+    public subscribeScore(
+        roomId: string,
+        fn: (users: Array<{ nickname: string; score: number }>) => void,
+    ) {
+        return roomDatabase.subscribeScore(roomId, fn)
+    }
 }
 
 export const gameManager = new GameManager()

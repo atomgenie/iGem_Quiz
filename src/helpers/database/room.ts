@@ -50,6 +50,28 @@ class RoomDatabase {
 
         await this.getUser(roomId, username).update({ score, level })
     }
+
+    public subscribeScore(
+        roomId: string,
+        fn: (users: Array<{ nickname: string; score: number }>) => void,
+    ) {
+        return (firebaseHelper.db
+            .collection("rooms")
+            .doc(roomId)
+            .collection("users") as DbRoom["users"])
+            .orderBy("score", "desc")
+            .onSnapshot({}, snapshot => {
+                const users: Array<{ nickname: string; score: number }> = []
+
+                snapshot.forEach(user => {
+                    const data = user.data()
+
+                    users.push({ nickname: data.name, score: data.score || 0 })
+                })
+
+                fn(users)
+            })
+    }
 }
 
 export const roomDatabase = new RoomDatabase()
