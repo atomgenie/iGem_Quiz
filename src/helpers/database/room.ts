@@ -7,6 +7,7 @@ interface DbRoom {
         roomId: string
         score: number | null
         level: "UNKNOWN" | "EASY" | "MEDIUM" | "HARD"
+        userId: string
     }>
 }
 
@@ -17,13 +18,19 @@ class RoomDatabase {
             .collection("users") as DbRoom["users"]).doc(username)
     }
 
-    public async insertUser(roomId: string, username: string) {
+    public async insertUser(roomId: string, username: string, userId: string) {
         await this.getUser(roomId, username).set({
             name: username,
             roomId: roomId,
             score: null,
             level: "UNKNOWN",
+            userId,
         })
+    }
+
+    public async checkUserExists(roomId: string, username: string) {
+        const userData = await this.getUser(roomId, username).get()
+        return userData.exists
     }
 
     public async setScore(

@@ -6,10 +6,10 @@ class GameManager {
     private playerName?: string
     private roomId?: string
 
-    public async registerRoom(playerName: string, roomId: string) {
+    public async registerRoom(playerName: string, roomId: string, userId: string) {
         this.playerName = playerName
         this.roomId = roomId
-        await roomDatabase.insertUser(roomId, playerName)
+        await roomDatabase.insertUser(roomId, playerName, userId)
     }
 
     public async setScore(score: number, level: LEVEL_TYPE) {
@@ -30,6 +30,10 @@ class GameManager {
         fn: (users: Array<{ nickname: string; score: number }>) => void,
     ) {
         return roomDatabase.subscribeScore(roomId, fn)
+    }
+
+    public async checkUserAlreadyExists(playerName: string, roomId: string) {
+        return roomDatabase.checkUserExists(roomId, playerName)
     }
 }
 

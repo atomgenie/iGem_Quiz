@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react"
 import styles from "./OnlineRegister.module.scss"
 import { useSpring, a } from "react-spring"
 import { gameManager } from "helpers/game"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { setOnline } from "helpers/redux/data/data.actions"
+import { StoreType } from "helpers/redux/store"
 
 interface props {
     nextScreen: () => void
@@ -52,28 +53,45 @@ const OnlineRegister: React.FC<props> = ({ nextScreen }) => {
     const [roomId, setRoomId] = useState("")
     const [nickname, setNickname] = useState("")
 
-    const [isError, setIsError] = useState(false)
+    const [isError, setIsError] = useState<null | string>(null)
     const [isLoading, setIsLoading] = useState(false)
 
     const reduxDispatch = useDispatch()
 
+    const userId = useSelector<StoreType, string | undefined>(store => store.data.userId)
+
     const handleRegister = async () => {
         if (!roomId || !nickname) {
-            setIsError(true)
+            setIsError("Please enter valid values")
             return
         }
-        setIsError(false)
+
+        if (!userId) {
+            setIsError("Please try again later")
+            return
+        }
+
+        setIsError(null)
 
         setIsLoading(true)
 
         try {
-            await gameManager.registerRoom(nickname, roomId)
+            await gameManager.registerRoom(nickname, roomId, userId)
             setIsLoading(false)
             reduxDispatch(setOnline(nickname, roomId))
             await outSprings()
             nextScreen()
         } catch {
-            setIsError(true)
+            try {
+                if (await gameManager.checkUserAlreadyExists(nickname, roomId)) {
+                    setIsError("This username is already took")
+                } else {
+                    setIsError("Please enter valid values")
+                }
+            } catch {
+                setIsError("Please enter valid values")
+            }
+
             setIsLoading(false)
         }
     }
@@ -99,7 +117,7 @@ const OnlineRegister: React.FC<props> = ({ nextScreen }) => {
                     onChange={e => setNickname(e.target.value)}
                 />
             </a.div>
-            {isError && <div className={styles.error}>Please enter valid values</div>}
+            {isError && <div className={styles.error}>{isError}</div>}
 
             <a.div style={buttonSpring as any} className={styles.playBtn}>
                 {isLoading ? (

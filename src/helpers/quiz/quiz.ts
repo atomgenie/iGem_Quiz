@@ -1,6 +1,6 @@
 import { LEVEL_TYPE } from "helpers/level-type"
 
-export const MAX_QUIZ_SIZE = 5
+export const MAX_QUIZ_SIZE = 20
 
 export interface Question {
     question: string

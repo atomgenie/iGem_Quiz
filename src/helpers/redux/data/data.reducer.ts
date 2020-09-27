@@ -64,6 +64,12 @@ export const dataReducer: Reducer<DataState, Actions> = (
                 },
             }
         }
+        case ACTION.SET_USER_ID: {
+            return {
+                ...state,
+                userId: action.userId,
+            }
+        }
         default:
             return state
     }

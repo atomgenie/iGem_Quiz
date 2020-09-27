@@ -16,6 +16,7 @@ export interface DataState {
         | {
               active: false
           }
+    userId?: string
 }
 
 export enum ACTION {
@@ -27,6 +28,7 @@ export enum ACTION {
     RESET_QUIZ = "DATA/RESET_QUIZ",
     SET_FULL_QUIZ = "DATA/SET_FULL_QUIZ",
     SET_ONLINE = "DATA/SET_ONLINE",
+    SET_USER_ID = "DATA/SET_USER_ID",
 }
 
 interface SetLevel {
@@ -68,6 +70,11 @@ interface SetOnline {
     roomId: string
 }
 
+interface SetUserId {
+    type: ACTION.SET_USER_ID
+    userId: string | undefined
+}
+
 export type Actions =
     | SetLevel
     | SetQuiz
@@ -77,3 +84,4 @@ export type Actions =
     | ResetQuiz
     | SetFullQuiz
     | SetOnline
+    | SetUserId

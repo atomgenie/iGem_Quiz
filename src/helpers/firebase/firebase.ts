@@ -1,5 +1,8 @@
-import { initializeApp, firestore } from "firebase/app"
+import { initializeApp, firestore, auth } from "firebase/app"
 import "firebase/firestore"
+import "firebase/auth"
+import { setUserId } from "helpers/redux/data/data.actions"
+import { store } from "helpers/redux/store"
 
 const firebaseConfig = {
     apiKey: "AIzaSyBeqwW3gu986ZT0Nel5kFAX_p6fFXi-VNA",
@@ -20,6 +23,15 @@ export type CollectionReference<
 class FirebaseHelper {
     public initializeFirebase() {
         initializeApp(firebaseConfig)
+        auth().signInAnonymously()
+
+        auth().onAuthStateChanged(user => {
+            if (user) {
+                store.dispatch(setUserId(user.uid))
+            } else {
+                store.dispatch(setUserId(undefined))
+            }
+        })
     }
 
     private database: firestore.Firestore | undefined = undefined

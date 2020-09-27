@@ -31,13 +31,20 @@ export const resetQuiz = (): Actions => ({
     type: ACTION.RESET_QUIZ,
 })
 
-export const setFullQuiz = (payload: DataState): Actions => ({
-    type: ACTION.SET_FULL_QUIZ,
-    payload,
-})
+export const setFullQuiz = (payload: DataState): Actions => {
+    return {
+        type: ACTION.SET_FULL_QUIZ,
+        payload,
+    }
+}
 
 export const setOnline = (nickname: string, roomId: string): Actions => ({
     type: ACTION.SET_ONLINE,
     nickname,
     roomId,
+})
+
+export const setUserId = (userId: string | undefined): Actions => ({
+    type: ACTION.SET_USER_ID,
+    userId,
 })
