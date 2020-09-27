@@ -13,6 +13,10 @@ class QuizHelper {
         return quiz
             .filter(elm => mapDifficultyToLevelType[elm.difficulty] === difficulty)
             .sort(() => Math.random() * 2 - 1)
+            .map(elm => ({
+                ...elm,
+                options: elm.options.sort(() => Math.random() * 2 - 1),
+            }))
             .slice(0, MAX_QUIZ_SIZE)
     }
 
