@@ -8,6 +8,7 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+    position: relative;
 }
 
 .card {
@@ -21,6 +22,25 @@
     position: relative;
 }
 
+.cardExplanation {
+    @extend .card;
+    position: absolute;
+    top: 0;
+    width: calc(100% - 100px);
+}
+
+.buttonNext {
+    position: absolute;
+    bottom: 40px;
+    z-index: 5;
+    width: calc(100% - 40px);
+
+    > div {
+        width: 100%;
+        height: 50px;
+    }
+}
+
 .title {
     text-transform: uppercase;
     font-size: 11px;
@@ -31,6 +51,11 @@
 .questionTitle {
     font-size: 15px;
     font-weight: 800;
+    line-height: 1.1;
+}
+
+.questionExplanation {
+    font-size: 15px;
     line-height: 1.1;
 }
 

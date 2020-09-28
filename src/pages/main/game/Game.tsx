@@ -77,13 +77,52 @@ const Game: React.FC<props> = ({ restartGame }) => {
 
     const [showValid, setShowValid] = useState<boolean>(false)
 
-    const handleNextQuestion = async () => {
+    const [explanationSpring, setExplanantionSpring] = useSpring(() => ({
+        opacity: 0,
+        left: 500,
+    }))
+
+    const [nextSpring, setNextSpring] = useSpring(() => ({
+        opacity: 0,
+        bottom: -400,
+        display: "none",
+    }))
+
+    const inExplanation = async () => {
+        await Promise.all([
+            setNextSpring({ display: "block", immediate: true }),
+            setExplanantionSpring({ left: 500, immediate: true }),
+        ])
+        await Promise.all([
+            setExplanantionSpring({ opacity: 1, left: 0 }),
+            setNextSpring({ opacity: 1, bottom: 40 }),
+        ])
+    }
+
+    const outExplanation = async () => {
+        await Promise.all([
+            setExplanantionSpring({ opacity: 0, left: -500 }),
+            setNextSpring({ opacity: 0, bottom: -400 }),
+        ])
+        await setNextSpring({ display: "none", immediate: true })
+    }
+
+    const handleShowValid = async () => {
         reduxDispatch(incrementQuestion())
         setAllowInteraction(false)
 
         setShowValid(true)
         await new Promise(res => setTimeout(res, 1500))
         await Promise.all([outOptions(), outPanel()])
+
+        if (actualQuestion?.explanation) {
+            await inExplanation()
+        } else {
+            await handleNextQuestion()
+        }
+    }
+
+    const handleNextQuestion = async () => {
         setPos(pos + 1)
         setShowValid(false)
         setClickeds([])
@@ -107,7 +146,7 @@ const Game: React.FC<props> = ({ restartGame }) => {
     }
 
     const handleWrongAnswer = async () => {
-        handleNextQuestion()
+        handleShowValid()
     }
 
     const handleClick = (value: string) => {
@@ -128,7 +167,7 @@ const Game: React.FC<props> = ({ restartGame }) => {
 
         if (responseState === RESPONSE_STATE.VALID) {
             reduxDispatch(incrementScore())
-            handleNextQuestion()
+            handleShowValid()
             return
         }
 
@@ -180,6 +219,34 @@ const Game: React.FC<props> = ({ restartGame }) => {
                 </div>
                 <div className={styles.questionTitle}>{actualQuestion.question}</div>
             </a.div>
+            {actualQuestion.explanation && (
+                <>
+                    <a.div
+                        className={styles.cardExplanation}
+                        style={explanationSpring as any}
+                    >
+                        <div className={styles.title}>Explanantion</div>
+                        <div className={styles.questionExplanation}>
+                            {actualQuestion.explanation}
+                        </div>
+                    </a.div>
+                    <a.div className={styles.buttonNext} style={nextSpring as any}>
+                        <Button
+                            startColor="white"
+                            endColor="#dedede"
+                            borderColor="#bdbdbd"
+                            shadow="rgba(0, 0, 0, 0.2)"
+                            onClick={async () => {
+                                await outExplanation()
+                                await handleNextQuestion()
+                            }}
+                        >
+                            Next
+                        </Button>
+                    </a.div>
+                </>
+            )}
+
             <div className={styles.solutionList}>
                 <div className={styles.listOptions}>
                     <a.div style={transitionHint as any} className={styles.hint}>
