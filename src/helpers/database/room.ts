@@ -39,7 +39,7 @@ class RoomDatabase {
         score: number,
         levelType: LEVEL_TYPE,
     ) {
-        let level: "EASY" | "MEDIUM" | "HARD"
+        let level: "EASY" | "MEDIUM"
 
         switch (levelType) {
             case LEVEL_TYPE.EASY:
@@ -48,10 +48,6 @@ class RoomDatabase {
 
             case LEVEL_TYPE.MEDIUM:
                 level = "MEDIUM"
-                break
-
-            case LEVEL_TYPE.HARD:
-                level = "HARD"
                 break
         }
 

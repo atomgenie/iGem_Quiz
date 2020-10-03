@@ -94,7 +94,7 @@ const Game: React.FC<props> = ({ restartGame }) => {
             setExplanantionSpring({ left: 500, immediate: true }),
         ])
         await Promise.all([
-            setExplanantionSpring({ opacity: 1, left: 0 }),
+            setExplanantionSpring({ opacity: 1, left: 15 }),
             setNextSpring({ opacity: 1, bottom: 40 }),
         ])
     }

@@ -23,11 +23,6 @@ const LevelChoice: React.FC<props> = ({ handleNextView }) => {
         opacity: 0,
     }))
 
-    const [card3, setCard3] = useSpring(() => ({
-        left: "150%",
-        opacity: 0,
-    }))
-
     useEffect(() => {
         const startAnim = async () => {
             await Promise.all([
@@ -38,17 +33,11 @@ const LevelChoice: React.FC<props> = ({ handleNextView }) => {
                         res()
                     }, 150),
                 ),
-                new Promise(res =>
-                    setTimeout(async () => {
-                        await setCard3({ left: "0%", opacity: 1 })
-                        res()
-                    }, 300),
-                ),
             ])
         }
 
         startAnim()
-    }, [setCard1, setCard2, setCard3])
+    }, [setCard1, setCard2])
 
     const handleLevelChoice = async (levelType: LEVEL_TYPE) => {
         reduxDispatch(setLevel(levelType))
@@ -60,12 +49,6 @@ const LevelChoice: React.FC<props> = ({ handleNextView }) => {
                     await setCard2({ left: "-150%", opacity: 0 })
                     res()
                 }, 150),
-            ),
-            new Promise(res =>
-                setTimeout(async () => {
-                    await setCard3({ left: "-150%", opacity: 0 })
-                    res()
-                }, 300),
             ),
         ])
 
@@ -83,7 +66,7 @@ const LevelChoice: React.FC<props> = ({ handleNextView }) => {
                         className={styles.button}
                         onClick={() => handleLevelChoice(LEVEL_TYPE.EASY)}
                     >
-                        Easy
+                        Medium
                     </Button>
                 </div>
                 <div className={styles.text}>
@@ -100,24 +83,10 @@ const LevelChoice: React.FC<props> = ({ handleNextView }) => {
                         className={styles.button}
                         onClick={() => handleLevelChoice(LEVEL_TYPE.MEDIUM)}
                     >
-                        Medium
+                        Challenging
                     </Button>
                 </div>
                 <div className={styles.text}>For advanced scientists</div>
-            </a.div>
-            <a.div style={card3 as any} className={styles.card}>
-                <div className={styles.buttonDiv}>
-                    <Button
-                        startColor="#E52528"
-                        endColor="#BF1C2B"
-                        borderColor="#890406"
-                        className={styles.button}
-                        onClick={() => handleLevelChoice(LEVEL_TYPE.HARD)}
-                    >
-                        Hard
-                    </Button>
-                </div>
-                <div className={styles.text}>For experts</div>
             </a.div>
         </div>
     )

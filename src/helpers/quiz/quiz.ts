@@ -8,7 +8,7 @@ export interface Question {
     options: string[]
     corrects: string[]
     isOr: boolean
-    difficulty: "Easy" | "Medium" | "Hard"
+    difficulty: "Easy" | "Medium"
     explanation: string
 }
 
@@ -25,5 +25,4 @@ export const quiz = quizList.map(
 export const mapDifficultyToLevelType = {
     Easy: LEVEL_TYPE.EASY,
     Medium: LEVEL_TYPE.MEDIUM,
-    Hard: LEVEL_TYPE.HARD,
 }
