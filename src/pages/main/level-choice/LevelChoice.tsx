@@ -66,7 +66,7 @@ const LevelChoice: React.FC<props> = ({ handleNextView }) => {
                         className={styles.button}
                         onClick={() => handleLevelChoice(LEVEL_TYPE.EASY)}
                     >
-                        Medium
+                        Basics
                     </Button>
                 </div>
                 <div className={styles.text}>
