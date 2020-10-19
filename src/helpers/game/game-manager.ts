@@ -27,7 +27,9 @@ class GameManager {
 
     public subscribeScore(
         roomId: string,
-        fn: (users: Array<{ nickname: string; score: number }>) => void,
+        fn: (
+            users: Array<{ nickname: string; score: number; level: LEVEL_TYPE }>,
+        ) => void,
     ) {
         return roomDatabase.subscribeScore(roomId, fn)
     }

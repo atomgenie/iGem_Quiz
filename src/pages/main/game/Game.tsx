@@ -15,6 +15,7 @@ import styles from "./Game.module.scss"
 import { Button } from "assets"
 import { useSpring, a, useSprings } from "react-spring"
 import { quizHelper, RESPONSE_STATE } from "helpers/quiz/quiz-hepler"
+import { gameManager } from "helpers/game"
 
 interface props {
     restartGame: () => void
@@ -23,6 +24,12 @@ interface props {
 const Game: React.FC<props> = ({ restartGame }) => {
     const difficulty = useSelector<StoreType, LEVEL_TYPE>(store => store.data.levelType)
     const quizList = useSelector<StoreType, Question[]>(store => store.data.quiz)
+    const score = useSelector<StoreType, number>(store => store.data.score)
+
+    // If is online, update score
+    useEffect(() => {
+        gameManager.setScore(score, difficulty)
+    }, [score, difficulty])
 
     const [allowInteraction, setAllowInteraction] = useState<boolean>(true)
 

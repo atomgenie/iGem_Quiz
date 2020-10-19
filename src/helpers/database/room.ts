@@ -6,9 +6,19 @@ interface DbRoom {
         name: string
         roomId: string
         score: number | null
-        level: "UNKNOWN" | "EASY" | "MEDIUM" | "HARD"
+        level: "UNKNOWN" | "EASY" | "MEDIUM"
         userId: string
     }>
+}
+
+const dbLevel = ["UNKNOWN", "EASY", "MEDIUM"] as const
+
+const dbLevelToEnum: {
+    [T in typeof dbLevel[number]]: LEVEL_TYPE
+} = {
+    EASY: LEVEL_TYPE.EASY,
+    MEDIUM: LEVEL_TYPE.MEDIUM,
+    UNKNOWN: LEVEL_TYPE.EASY,
 }
 
 class RoomDatabase {
@@ -56,7 +66,9 @@ class RoomDatabase {
 
     public subscribeScore(
         roomId: string,
-        fn: (users: Array<{ nickname: string; score: number }>) => void,
+        fn: (
+            users: Array<{ nickname: string; score: number; level: LEVEL_TYPE }>,
+        ) => void,
     ) {
         return (firebaseHelper.db
             .collection("rooms")
@@ -64,12 +76,20 @@ class RoomDatabase {
             .collection("users") as DbRoom["users"])
             .orderBy("score", "desc")
             .onSnapshot({}, snapshot => {
-                const users: Array<{ nickname: string; score: number }> = []
+                const users: Array<{
+                    nickname: string
+                    score: number
+                    level: LEVEL_TYPE
+                }> = []
 
                 snapshot.forEach(user => {
                     const data = user.data()
 
-                    users.push({ nickname: data.name, score: data.score || 0 })
+                    users.push({
+                        nickname: data.name,
+                        score: data.score || 0,
+                        level: dbLevelToEnum[data.level] || LEVEL_TYPE.EASY,
+                    })
                 })
 
                 fn(users)
