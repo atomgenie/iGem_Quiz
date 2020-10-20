@@ -20,7 +20,7 @@ const mapLevelToString: {
 
 export default () => {
     const { roomId } = useParams<{ roomId: string | undefined }>()
-    const [users, setUsers] = useState<
+    const [allUsers, setAllUsers] = useState<
         Array<{ nickname: string; score: number; level: LEVEL_TYPE }>
     >([])
 
@@ -32,13 +32,23 @@ export default () => {
         }
 
         const unsubscribe = gameManager.subscribeScore(realRoomId, snapshotUsers => {
-            setUsers(snapshotUsers.slice(0, 20))
+            setAllUsers(snapshotUsers)
         })
 
         return () => {
             unsubscribe()
         }
     }, [realRoomId])
+
+    const users = useMemo(() => {
+        return allUsers
+            .map(user => ({
+                ...user,
+                finalScore: user.score * multiplicator[user.level],
+            }))
+            .sort((userA, userB) => userB.finalScore - userA.finalScore)
+            .slice(0, 20)
+    }, [allUsers])
 
     return (
         <div className={styles.root}>
@@ -55,9 +65,7 @@ export default () => {
                         <div className={styles.diffculty}>
                             {mapLevelToString[user.level]}
                         </div>
-                        <div className={styles.score}>
-                            {user.score * multiplicator[user.level]}
-                        </div>
+                        <div className={styles.score}>{user.finalScore}</div>
                     </div>
                 ))}
             </div>
